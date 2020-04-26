@@ -13,12 +13,22 @@ const Private = ({ auth }) => {
       })
       .then((res) => setCourses(res.courses))
       .catch((err) => setCourses(err.message));
-  }, []);
+
+    fetch('/admin', {
+      headers: { Authorization: `Bearer ${auth.getAccessToken()}` },
+    })
+      .then((res) => {
+        if (res.ok) return res.json();
+        throw new Error('network response was not ok');
+      })
+      .then((res) => console.log(res))
+      .catch((err) => console.log(err));
+  }, [auth]);
 
   return (
     <ul>
       {courses.map((course) => (
-        <li key={course}>{course.title}</li>
+        <li key={course.id}>{course.title}</li>
       ))}
     </ul>
   );

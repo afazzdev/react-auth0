@@ -18,6 +18,17 @@ var jwtCheck = jwt({
 
 const app = express();
 
+function checkRole(role) {
+  return function (req, res, next) {
+    const assignedRoles = req.user['http://localhost:3000/roles'];
+    if (Array.isArray(assignedRoles) && assignedRoles.includes(role)) {
+      return next();
+    } else {
+      return res.status(401).send('Insufficient role');
+    }
+  };
+}
+
 app.get('/public', function (req, res) {
   res.json({
     message: 'Hello from public API',
@@ -39,6 +50,12 @@ app.get('/courses', jwtCheck, checkScope(['read:courses']), function (
       { id: 1, title: 'Building apps with react and redux' },
       { id: 2, title: 'Creating Reusable react components' },
     ],
+  });
+});
+
+app.get('/admin', jwtCheck, checkRole('admin'), function (req, res) {
+  res.json({
+    message: 'Hello from Admin API',
   });
 });
 
